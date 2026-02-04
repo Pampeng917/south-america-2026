@@ -3,243 +3,723 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2026 南美冒險全紀錄</title>
+    <title>2026 南美探險之旅 EXPLORE SOUTH AMERICA</title>
+    <!-- 引入 FontAwesome 用於精緻線稿 Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #5d4037; --accent: #e64a19; --sky: #0288d1;
-            --bg: #f5f5f5; --white: #ffffff; --card-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            /* 暗黑奢華配色系統 */
+            --primary-orange: #f58220;   /* 高鐵橘 - 視覺焦點 */
+            --bg-body: #121212;          /* 極致黑 */
+            --bg-card: #1e1e1e;          /* 深灰卡片 */
+            --text-main: #e0e0e0;        /* 珍珠白文字 */
+            --text-sub: #a0a0a0;         /* 銀灰次要文字 */
+            --border-light: rgba(255, 255, 255, 0.08);
+            --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
         body {
-            font-family: -apple-system, "Noto Sans TC", sans-serif;
-            background-color: #ccc; margin: 0; padding: 0;
-            display: flex; justify-content: center;
+            font-family: -apple-system, "PingFang TC", "Noto Sans TC", "Helvetica Neue", sans-serif;
+            background-color: #000; margin: 0; padding: 0;
+            display: flex; justify-content: center; color: var(--text-main);
         }
 
         .main-wrapper {
-            width: 100%; max-width: 600px; background-color: var(--bg);
-            min-height: 100vh; position: relative; padding-bottom: 80px;
+            width: 100%; max-width: 600px; background-color: var(--bg-body);
+            min-height: 100vh; position: relative; padding-bottom: 100px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
         }
 
+        /* Banner 設計 */
         header {
-            background: linear-gradient(135deg, var(--primary), #3e2723);
-            color: white; padding: 30px 20px; text-align: center;
-            border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
+            background: linear-gradient(to bottom, rgba(18,18,18,0.3), var(--bg-body)), url('https://www.arch.tw/uploads/tiny_mce/images/1(91).jpg');
+            background-size: cover; background-position: center;
+            padding: 100px 20px 40px; text-align: center;
+            position: relative;
         }
 
-        .tab-content { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
+        header::after {
+            content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 60px; height: 3px; background: var(--primary-orange); border-radius: 2px;
+        }
+
+        header h1 { 
+            margin: 0; font-size: 1.8rem; font-weight: 800; letter-spacing: 2px; 
+            text-shadow: 0 4px 10px rgba(0,0,0,0.8); color: #fff;
+        }
+        header p { 
+            margin: 12px 0 0; font-size: 0.85rem; letter-spacing: 4px; 
+            color: rgba(255,255,255,0.8); font-weight: 300; text-transform: uppercase;
+        }
+
+        #countdown {
+            margin-top: 25px; display: inline-block;
+            font-size: 0.85rem; color: var(--primary-orange); border: 1px solid var(--primary-orange);
+            padding: 8px 24px; border-radius: 50px; font-family: monospace; font-weight: bold;
+            background: rgba(245, 130, 32, 0.05); backdrop-filter: blur(5px);
+        }
+
+        /* 內容區塊 */
+        .tab-content { display: none; padding: 25px 20px; animation: fadeIn 0.5s ease; }
         .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 行程卡片 */
-        .card { background: var(--white); border-radius: 12px; padding: 18px; margin-bottom: 15px; box-shadow: var(--card-shadow); border-left: 5px solid var(--primary); }
-        .day-info { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 10px; }
-        .day-num { background: var(--primary); color: white; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; }
-        .date { font-size: 0.85rem; color: #888; }
-        .title { font-size: 1.1rem; font-weight: bold; color: #333; margin: 5px 0; }
-        .location { font-size: 0.85rem; color: var(--sky); margin-bottom: 8px; font-weight: 500; }
-        .temp-info { font-size: 0.75rem; background: #e1f5fe; color: #01579b; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-bottom: 10px; }
+        /* 卡片通用設計 */
+        .card { 
+            background: var(--bg-card); border-radius: 12px; padding: 24px; margin-bottom: 24px; 
+            box-shadow: var(--shadow-card); border: 1px solid var(--border-light);
+            position: relative; overflow: hidden;
+        }
         
-        .desc { font-size: 0.9rem; color: #555; line-height: 1.6; }
-        .blog-link { display: block; margin-top: 10px; color: var(--sky); text-decoration: none; font-size: 0.85rem; font-weight: bold; }
+        .day-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .day-label { color: var(--primary-orange); font-weight: 900; font-size: 1.1rem; letter-spacing: 1px; }
+        .date-label { color: var(--text-sub); font-size: 0.8rem; font-weight: 500; font-family: monospace; }
+        
+        .route-info { 
+            font-size: 0.95rem; color: var(--text-main); font-weight: bold; 
+            display: flex; align-items: center; gap: 8px; margin-bottom: 12px; 
+        }
+        .temp-badge { 
+            background: rgba(255,255,255,0.05); color: var(--text-sub); 
+            padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; margin-left: auto; border: 1px solid var(--border-light);
+        }
 
-        /* 清單樣式 */
-        .list-section { margin-bottom: 25px; }
-        .list-section h3 { font-size: 1rem; color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 5px; margin-bottom: 10px; }
-        .todo-item { display: flex; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid #eee; }
-        .todo-item input { width: 18px; height: 18px; margin-right: 12px; accent-color: var(--accent); cursor: pointer; }
-        .todo-item span { font-size: 0.9rem; }
-        .remark { font-size: 0.75rem; color: #888; display: block; }
+        .intro-text { font-size: 0.9rem; line-height: 1.8; color: #ccc; margin-bottom: 20px; text-align: justify; font-weight: 300; }
+
+        .blog-link { 
+            display: flex; align-items: center; gap: 8px; margin-bottom: 15px; font-size: 0.8rem; 
+            color: var(--primary-orange); text-decoration: none; font-weight: 500; letter-spacing: 0.5px;
+            transition: 0.3s;
+        }
+        
+        /* 飯店與備註區塊 */
+        .hotel-box {
+            background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.1); 
+            border-radius: 8px; padding: 15px; 
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;
+        }
+        .hotel-info { font-size: 0.9rem; font-weight: bold; color: var(--text-main); }
+        .hotel-label { font-size: 0.65rem; color: var(--text-sub); display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; }
+        .map-icon { font-size: 1.1rem; color: var(--primary-orange); text-decoration: none; opacity: 0.8; transition: 0.2s; }
+
+        .memo-area { 
+            background: rgba(245, 130, 32, 0.05); padding: 12px; border-radius: 8px; 
+            display: flex; align-items: center; border: 1px solid rgba(245, 130, 32, 0.15);
+        }
+        .memo-icon { font-size: 0.9rem; margin-right: 10px; color: var(--primary-orange); }
+        .memo-input { 
+            border: none; background: transparent; width: 100%; outline: none; 
+            font-size: 0.85rem; color: var(--text-main); font-family: inherit;
+        }
+        .memo-input::placeholder { color: rgba(255,255,255,0.2); }
+
+        /* 交通票卡 UI (修復 Icon 遮擋問題) */
+        .timeline-date {
+            font-size: 0.85rem; color: var(--text-sub); margin: 25px 0 10px; padding-left: 10px;
+            border-left: 3px solid var(--primary-orange); font-weight: bold; letter-spacing: 1px;
+        }
+        
+        .ticket {
+            background: var(--bg-card); border-radius: 10px; margin-bottom: 15px; 
+            box-shadow: var(--shadow-card); border: 1px solid var(--border-light);
+            position: relative; overflow: hidden; display: flex;
+        }
+        
+        .ticket::before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; 
+            background: var(--primary-orange);
+        }
+
+        .t-main { padding: 18px; flex: 1; }
+        .t-route { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .t-city { text-align: center; width: 60px; } /* 固定寬度防止跑版 */
+        .t-code { font-size: 1.4rem; font-weight: 800; color: var(--text-main); line-height: 1; letter-spacing: 1px; }
+        .t-name { font-size: 0.75rem; color: var(--text-sub); margin-top: 4px; }
+        
+        /* 視覺優化核心：獨立的圖形區塊 */
+        .t-mid { 
+            flex: 1; text-align: center; display: flex; flex-direction: column; 
+            justify-content: center; padding: 0 10px; 
+        }
+        .t-time { font-size: 0.7rem; color: var(--primary-orange); font-weight: bold; margin-bottom: 6px; white-space: nowrap; }
+        .t-graphic { 
+            position: relative; width: 100%; height: 20px; 
+            display: flex; align-items: center; justify-content: center; 
+        }
+        .t-line { 
+            width: 100%; height: 1px; background: rgba(255,255,255,0.15); position: absolute; 
+        }
+        .t-icon { 
+            position: relative; background: var(--bg-card); padding: 0 8px; 
+            color: var(--primary-orange); font-size: 0.8rem; z-index: 1; 
+        }
+
+        .t-detail { 
+            display: flex; justify-content: space-between; font-size: 0.75rem; color: #666; 
+            border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px;
+        }
+
+        /* 清單設計 */
+        .list-group { margin-bottom: 35px; }
+        .list-title { 
+            font-size: 1rem; color: var(--text-main); border-bottom: 1px solid var(--primary-orange); 
+            padding-bottom: 10px; margin-bottom: 20px; font-weight: bold; letter-spacing: 1px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .list-title i { color: var(--primary-orange); font-size: 0.9rem; }
+
+        .todo-item { 
+            display: flex; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--border-light); 
+            transition: 0.2s;
+        }
+        .todo-checkbox { 
+            appearance: none; -webkit-appearance: none;
+            width: 18px; height: 18px; border: 1px solid var(--text-sub); border-radius: 4px;
+            margin-right: 15px; margin-top: 2px; cursor: pointer; position: relative;
+        }
+        .todo-checkbox:checked { background: var(--primary-orange); border-color: var(--primary-orange); }
+        .todo-checkbox:checked::after {
+            content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+            color: #fff; font-size: 10px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        }
+        .todo-text { font-size: 0.9rem; color: #ccc; line-height: 1.5; }
+        .todo-sub { display: block; font-size: 0.75rem; color: #666; margin-top: 4px; }
 
         /* 底部導航 */
         .nav-bar {
             position: fixed; bottom: 0; width: 100%; max-width: 600px;
-            background: white; display: flex; box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            background: rgba(18, 18, 18, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            display: flex; border-top: 1px solid var(--border-light); z-index: 100;
+            padding-bottom: env(safe-area-inset-bottom);
         }
-        .nav-btn { flex: 1; border: none; background: none; padding: 12px 0; color: #999; font-size: 0.75rem; text-align: center; }
-        .nav-btn.active { color: var(--accent); font-weight: bold; }
-        .nav-btn span { display: block; font-size: 1.4rem; margin-bottom: 2px; }
-
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        td { padding: 10px 5px; border-bottom: 1px solid #eee; }
+        .nav-btn { 
+            flex: 1; border: none; background: none; padding: 16px 0; 
+            color: #666; font-size: 0.7rem; font-weight: 500; cursor: pointer; transition: 0.3s;
+        }
+        .nav-btn.active { color: var(--text-main); }
+        .nav-btn i { 
+            display: block; font-size: 1.2rem; color: #555; margin-bottom: 6px; transition: 0.3s;
+        }
+        .nav-btn.active i { color: var(--primary-orange); transform: translateY(-2px); text-shadow: 0 0 15px rgba(245, 130, 32, 0.4); }
     </style>
 </head>
 <body>
 
 <div class="main-wrapper">
     <header>
-        <h1 style="margin:0;">2026 南美 19 天大探險</h1>
-        <p style="margin:5px 0 0;">Peru · Bolivia · Chile</p>
+        <h1>2026 南美探險之旅</h1>
+        <p>EXPLORE SOUTH AMERICA</p>
+        <div id="countdown">載入中...</div>
     </header>
 
+    <!-- 1. 行程分頁 -->
     <div id="itinerary" class="tab-content active">
         
+        <!-- Day 1 -->
         <div class="card">
-            <div class="day-info"><span class="day-num">DAY 01-03</span><span class="date">02/11 - 02/13</span></div>
-            <div class="title">✈️ 啟程與抵達利馬</div>
-            <div class="location">📍 桃園 ➔ 洛杉磯 ➔ 利馬</div>
-            <div class="temp-info">🌡️ 18°C - 26°C | 👕 短袖 + 薄外套</div>
-            <p class="desc">19:40 桃園起飛，跨越換日線抵達美食之都利馬。02/13 晚上 22:00 旅行社接機。</p>
+            <div class="day-header"><span class="day-label">DAY 01</span><span class="date-label">02/11 (三)</span></div>
+            <div class="route-info"><i class="fa-solid fa-location-dot" style="color:var(--primary-orange)"></i> 台北 ➔ 洛杉磯 ➔ 利馬 <span class="temp-badge">18-24°C</span></div>
+            <p class="intro-text">晚上 19:40 從桃園機場起飛，跨越太平洋的長途飛行正式開始。在洛杉磯轉機約 4.5 小時後，繼續飛往南美洲。這是一場體力的考驗，建議在飛機上爭取時間休息。</p>
+            <div class="memo-area"><i class="fa-regular fa-pen-to-square memo-icon"></i><input type="text" class="memo-input" id="m1" placeholder="備註：保濕乳液隨身帶..." oninput="saveM('m1')"></div>
         </div>
 
+        <!-- Day 2 -->
         <div class="card">
-            <div class="day-info"><span class="day-num">DAY 04</span><span class="date">02/14 (六)</span></div>
-            <div class="title">🏔️ 飛向千年古都庫斯科</div>
-            <div class="location">📍 利馬 ➔ 庫斯科 (3400m)</div>
-            <div class="temp-info">🌡️ 6°C - 18°C | 🧥 洋蔥式穿法</div>
-            <p class="desc">白天利馬市區觀光，晚上飛往庫斯科。抵達後請務必放慢動作適應高原氣候。</p>
+            <div class="day-header"><span class="day-label">DAY 02</span><span class="date-label">02/12 (四)</span></div>
+            <div class="route-info"><i class="fa-solid fa-location-dot" style="color:var(--primary-orange)"></i> 抵達利馬 (Lima) <span class="temp-badge">20-27°C</span></div>
+            <p class="intro-text">早上 08:10 抵達秘魯首都利馬。利馬是南美的美食之都，擁有世界排名前列的餐廳。今日主要為休息與適應時差，可前往 Miraflores 區的懸崖商場欣賞太平洋日落。</p>
+            <div class="hotel-box">
+                <div><span class="hotel-label">ACCOMMODATION</span><div class="hotel-info">Hotel Girasol (或同級)</div></div>
+                <a href="https://maps.google.com/?q=Hotel+Girasol+Lima" target="_blank" class="map-icon"><i class="fa-solid fa-map-location-dot"></i></a>
+            </div>
+            <div class="memo-area"><i class="fa-regular fa-pen-to-square memo-icon"></i><input type="text" class="memo-input" id="m2" placeholder="備註..." oninput="saveM('m2')"></div>
         </div>
 
+        <!-- Day 3 -->
         <div class="card">
-            <div class="day-info"><span class="day-num">DAY 05</span><span class="date">02/15 (日)</span></div>
-            <div class="title">🏺 聖谷一日遊：印加文明初探</div>
-            <div class="location">📍 Chinchero / Maras / Moray</div>
-            <div class="desc">08:00 出發參觀圓形梯田與白色鹽田。這是一場視覺與歷史的饗宴，為馬丘比丘熱身。</div>
+            <div class="day-header"><span class="day-label">DAY 03</span><span class="date-label">02/13 (五)</span></div>
+            <div class="route-info"><i class="fa-solid fa-location-dot" style="color:var(--primary-orange)"></i> 利馬一日遊 & 接機 <span class="temp-badge">20-27°C</span></div>
+            <p class="intro-text">自由活動日。推薦參觀利馬舊城區 (Historic Centre)，欣賞殖民時期的陽台建築與聖方濟各修道院的地下墓穴。晚上約 22:00 旅行社會來機場接駁其他較晚抵達的團員。</p>
+            <div class="memo-area"><i class="fa-regular fa-pen-to-square memo-icon"></i><input type="text" class="memo-input" id="m3" placeholder="備註：試試 Ceviche 生魚..." oninput="saveM('m3')"></div>
         </div>
 
+        <!-- Day 4 -->
         <div class="card">
-            <div class="day-info"><span class="day-num">DAY 06</span><span class="date">02/16 (一)</span></div>
-            <div class="title">🛂 簽證任務與前進熱水鎮</div>
-            <div class="location">📍 庫斯科 ➔ 熱水鎮</div>
-            <p class="desc">上午前往玻利維亞大使館辦簽。19:00 搭乘景觀火車前往馬丘比丘山腳下。</p>
+            <div class="day-header"><span class="day-label">DAY 04</span><span class="date-label">02/14 (六)</span></div>
+            <div class="route-info"><i class="fa-solid fa-location-dot" style="color:var(--primary-orange)"></i> 利馬 ➔ 庫斯科 (Cusco) <span class="temp-badge">6-18°C</span></div>
+            <p class="intro-text">白天利馬最後巡禮，晚上搭乘 LA2069 (19:25) 飛往海拔 3400m 的古都庫斯科。抵達後請務必放慢動作，多喝 Coca Tea 預防高山症，今晚早點休息。</p>
+            <div class="hotel-box">
+                <div><span class="hotel-label">ACCOMMODATION</span><div class="hotel-info">Hotel Rayme</div></div>
+                <a href="https://maps.google.com/?q=Hotel+Rayme+Cusco" target="_blank" class="map-icon"><i class="fa-solid fa-map-location-dot"></i></a>
+            </div>
+            <div class="memo-area"><i class="fa-regular fa-pen-to-square memo-icon"></i><input type="text" class="memo-input" id="m4" placeholder="備註：高山症藥吃了沒..." oninput="saveM('m4')"></div>
         </div>
 
-        <div class="card" style="border-left-color: var(--accent);">
-            <div class="day-info"><span class="day-num">DAY 07</span><span class="date">02/17 (二)</span></div>
-            <div class="title">🏛️ 遺落之城：馬丘比丘</div>
-            <div class="location">📍 Machu Picchu</div>
-            <div class="temp-info">🌡️ 10°C - 22°C | 🧢 防曬與雨具必備</div>
-            <p class="desc">印加帝國的巔峰結晶。建議走 2A/2B 路線獲取最佳視角。200 字深度介紹見下方網址。</p>
-            <a href="https://bobotravel.tw/blog/post/machu-picchu-circuits" class="blog-link">馬丘比丘路線攻略參考</a>
-        </div>
-
+        <!-- Day 5 -->
         <div class="card">
-            <div class="day-info"><span class="day-num">DAY 08</span><span class="date">02/18 (三)</span></div>
-            <div class="title">🌈 彩虹山挑戰：5200m 的震撼</div>
-            <div class="location">📍 Vinicunca ➔ 夜車至普諾</div>
-            <div class="temp-info">🌡️ -2°C - 10°C | 🧣 嚴寒裝備</div>
-            <p class="desc">06:00 出發。大地色調的奇蹟，強烈建議騎馬上山，保留氧氣給山頂美景。</p>
+            <div class="day-header"><span class="day-label">DAY 05</span><span class="date-label">02/15 (日)</span></div>
+            <div class="route-info"><i class="fa-solid fa-location-dot" style="color:var(--primary-orange)"></i> 聖谷一日遊 (Sacred Valley) <span class="temp-badge">8-20°C</span></div>
+            <p class="intro-text">08:00 出發。探訪印加帝國的糧倉，參觀 Chinchero 的傳統紡織、Maras 的白色鹽田以及 Moray 的圓形梯田實驗室。這是適應高度與了解印加智慧的最佳行程。</p>
+            <div class="hotel-box">
+                <div><span class="hotel-label">ACCOMMODATION</span><div class="hotel-info">Hotel Rayme</div></div>
+                <a href="https://maps.google.com/?q=Hotel+Rayme+Cusco" target="_blank" class="map-icon"><i class="fa-solid fa-map-location-dot"></i></a>
+            </div>
+            <div class="memo-area"><i class="fa-regular fa-pen-to-square memo-icon"></i><input type="text" class="memo-input" id="m5" placeholder="備註..." oninput="saveM('m5')"></div>
         </div>
 
+        <!-- Day 6 -->
         <div class="card">
-            <div class="day-info"><span class="day-num">DAY 09-10</span><span class="date">02/19 - 02/20</span></div>
-            <div class="title">🇧🇴 普諾與的的喀喀湖 ➔ 拉巴斯</div>
-            <div class="location">📍 蘆葦島 ➔ 陸路過境 ➔ La Paz</div>
-            <p class="desc">拜訪漂浮島嶼後陸路進入玻利維亞。體驗拉巴斯世界最高的纜車系統。20號搭夜車往烏尤尼。</p>
+            <div class="day-header"><span class="day-label">DAY 06</span><span class="date-label">02/16 (一)</span></div>
+            <div class="route-info"><i class="fa-solid fa-location-dot" style="color:var(--primary-orange)"></i> 辦簽證 & 前往熱水鎮 <span class="temp-badge">12-22°C</span></div>
+            <p class="intro-text">上午前往玻利維亞大使館辦理簽證。下午庫斯科市區導覽。約 15:30 或 19:00 搭乘觀光火車前往馬丘比丘山腳下的熱水鎮 (Aguas Calientes)。準備明天的一大早攻頂。</p>
+            <div class="hotel-box">
+                <div><span class="hotel-label">ACCOMMODATION</span><div class="hotel-info">Coya Palace / Local Inn</div></div>
+                <a href="https://maps.google.com/?q=Aguas+Calientes+Peru" target="_blank" class="map-icon"><i class="fa-solid fa-map-location-dot"></i></a>
+            </div>
+            <div class="memo-area"><i class="fa-regular fa-pen-to-square memo-icon"></i><input type="text" class="memo-input" id="m6" placeholder="備註：護照要隨身帶..." oninput="saveM('m6')"></div>
         </div>
 
-        <div class="card" style="border-left-color: var(--sky);">
-            <div class="day-info"><span class="day-num">DAY 11-13</span><span class="date">02/21 - 02/23</span></div>
-            <div class="title">❄️ 烏尤尼天空之鏡 3D2N</div>
-            <div class="location">📍 Salar de Uyuni ➔ 聖佩德羅</div>
-            <div class="temp-info">🌡️ 0°C - 15°C | 📸 拍照道具必帶</div>
-            <p class="desc">核心行程。包含仙人掌島、鹽旅館、紅湖與無敵倒影。最後抵達智利聖佩德羅，加開星空團。</p>
-            <a href="https://yiling750124.pixnet.net/blog/post/47372721" class="blog-link">天空之鏡拍照與穿搭攻略</a>
-        </div>
-
+        <!-- Day 7 -->
         <div class="card">
-            <div class="day-info"><span class="day-num">DAY 14-16</span><span class="date">02/24 - 02/26</span></div>
-            <div class="title">🇨🇱 飛往聖地牙哥：市區與酒莊</div>
-            <div class="location">📍 卡拉馬 ➔ 聖地牙哥</div>
-            <div class="temp-info">🌡️ 15°C - 28°C | 🍷 適合優雅拍照</div>
-            <p class="desc">搭機飛往聖地牙哥。遊覽武器廣場、聖露西亞觀景台與安第斯山麓酒莊品酒。</p>
+            <div class="day-header"><span class="day-label">DAY 07</span><span class="date-label">02/17 (二)</span></div>
+            <div class="route-info"><i class="fa-solid fa-location-dot" style="color:var(--primary-orange)"></i> 馬丘比丘 (Machu Picchu) <span class="temp-badge">10-22°C</span></div>
+            <p class="intro-text">旅程的高潮！清晨搭巴士上山，親眼見證「天空之城」。推薦走 2A 或 2B 路線，能拍到最經典的明信片視角。午後搭乘火車返回庫斯科。記得穿防滑好走的鞋。</p>
+            <a href="https://bobotravel.tw/blog/post/machu-picchu-circuits" target="_blank" class="blog-link"><i class="fa-solid fa-book-open"></i> 閱讀：馬丘比丘參觀路線攻略</a>
+            <div class="hotel-box">
+                <div><span class="hotel-label">ACCOMMODATION</span><div class="hotel-info">Hotel Rayme</div></div>
+                <a href="https://maps.google.com/?q=Hotel+Rayme+Cusco" target="_blank" class="map-icon"><i class="fa-solid fa-map-location-dot"></i></a>
+            </div>
+            <div class="memo-area"><i class="fa-regular fa-pen-to-square memo-icon"></i><input type="text" class="memo-input" id="m7" placeholder="備註：防蚊液..." oninput="saveM('m7')"></div>
         </div>
 
+        <!-- Day 8 -->
         <div class="card">
-            <div class="day-info"><span class="day-num">DAY 17-19</span><span class="date">02/27 - 03/01</span></div>
-            <div class="title">✈️ 最後巡禮與歸途</div>
-            <div class="location">📍 聖地牙哥 ➔ LAX ➔ 桃園</div>
-            <p class="desc">享受智利美食，深夜前往機場。經洛杉磯轉機，於 3/1 下午 17:20 返抵國門。</p>
+            <div class="day-header"><span class="day-label">DAY 08</span><span class="date-label">02/18 (三)</span></div>
+            <div class="route-info"><i class="fa-solid fa-location-dot" style="color:var(--primary-orange)"></i> 彩虹山 (Rainbow Mtn.) <span class="temp-badge">-2~10°C</span></div>
+            <p class="intro-text">06:00 出發挑戰海拔 5200m 的彩虹山。這是意志力的考驗，強烈建議租馬騎上去，保留體力欣賞山頂絕景。晚上 22:00 搭乘夜間巴士前往普諾 (Puno)，今晚無法洗澡。</p>
+            <div class="hotel-box">
+                <div><span class="hotel-label">ACCOMMODATION</span><div class="hotel-info">Night Bus (VIP Seat)</div></div>
+                <span class="map-icon"><i class="fa-solid fa-bus"></i></span>
+            </div>
+            <div class="memo-area"><i class="fa-regular fa-pen-to-square memo-icon"></i><input type="text" class="memo-input" id="m8" placeholder="備註：保暖襪子..." oninput="saveM('m8')"></div>
+        </div>
+
+        <!-- Day 9 -->
+        <div class="card">
+            <div class="day-header"><span class="day-label">DAY 09</span><span class="date-label">02/19 (四)</span></div>
+            <div class="route-info"><i class="fa-solid fa-location-dot" style="color:var(--primary-orange)"></i> 普諾 & 的的喀喀湖 <span class="temp-badge">8-16°C</span></div>
+            <p class="intro-text">清晨抵達普諾，飯店簡單盥洗。接著搭船遊覽世界最高的可航行湖泊——的的喀喀湖，拜訪用蘆葦編織而成的浮島 (Uros) 與塔奇拉島 (Taquile)，體驗原住民文化。</p>
+            <div class="hotel-box">
+                <div><span class="hotel-label">ACCOMMODATION</span><div class="hotel-info">Hotel Caaoba Buho</div></div>
+                <a href="https://maps.google.com/?q=Puno+Peru" target="_blank" class="map-icon"><i class="fa-solid fa-map-location-dot"></i></a>
+            </div>
+            <div class="memo-area"><i class="fa-regular fa-pen-to-square memo-icon"></i><input type="text" class="memo-input" id="m9" placeholder="備註..." oninput="saveM('m9')"></div>
+        </div>
+
+        <!-- Day 10 -->
+        <div class="card">
+            <div class="day-header"><span class="day-label">DAY 10</span><span class="date-label">02/20 (五)</span></div>
+            <div class="route-info"><i class="fa-solid fa-location-dot" style="color:var(--primary-orange)"></i> 玻利維亞：拉巴斯 (La Paz) <span class="temp-badge">10-18°C</span></div>
+            <p class="intro-text">陸路過境進入玻利維亞。經由科帕卡瓦納 (Copacabana) 抵達世界最高首都拉巴斯。必搭乘城市纜車 (Mi Teleferico) 俯瞰壯觀的山城夜景。晚上 22:00 搭乘夜間巴士前往烏尤尼。</p>
+            <div class="hotel-box">
+                <div><span class="hotel-label">ACCOMMODATION</span><div class="hotel-info">Night Bus to Uyuni</div></div>
+                <span class="map-icon"><i class="fa-solid fa-bus"></i></span>
+            </div>
+            <div class="memo-area"><i class="fa-regular fa-pen-to-square memo-icon"></i><input type="text" class="memo-input" id="m10" placeholder="備註：準備暈車藥..." oninput="saveM('m10')"></div>
+        </div>
+
+        <!-- Day 11 -->
+        <div class="card">
+            <div class="day-header"><span class="day-label">DAY 11</span><span class="date-label">02/21 (六)</span></div>
+            <div class="route-info"><i class="fa-solid fa-location-dot" style="color:var(--primary-orange)"></i> 烏尤尼鹽沼 Day 1 <span class="temp-badge">0-18°C</span></div>
+            <p class="intro-text">天空之鏡 3D2N 團開始！乘坐 4x4 吉普車進入鹽沼，探訪列車墓場、鹽博物館。雨季時地面積水形成完美倒影，彷彿行走在雲端。晚上入住特色的鹽造旅館。</p>
+            <a href="https://yiling750124.pixnet.net/blog/post/47372721" target="_blank" class="blog-link"><i class="fa-solid fa-camera"></i> 閱讀：天空之鏡拍照穿搭攻略</a>
+            <div class="hotel-box">
+                <div><span class="hotel-label">ACCOMMODATION</span><div class="hotel-info">Salt Hotel</div></div>
+                <span class="map-icon"><i class="fa-solid fa-layer-group"></i></span>
+            </div>
+            <div class="memo-area"><i class="fa-regular fa-pen-to-square memo-icon"></i><input type="text" class="memo-input" id="m11" placeholder="備註：彩色衣服拍照..." oninput="saveM('m11')"></div>
+        </div>
+
+        <!-- Day 12 -->
+        <div class="card">
+            <div class="day-header"><span class="day-label">DAY 12</span><span class="date-label">02/22 (日)</span></div>
+            <div class="route-info"><i class="fa-solid fa-location-dot" style="color:var(--primary-orange)"></i> 烏尤尼鹽沼 Day 2 <span class="temp-badge">-5~15°C</span></div>
+            <p class="intro-text">深入高原荒漠，參觀仙人掌島 (Incahuasi) 與各式高山湖泊 (Lagunas)，其中紅湖 (Laguna Colorada) 棲息著成千上萬的粉紅火烈鳥，景色超現實。今晚住在國家公園附近的簡易旅館。</p>
+            <div class="hotel-box">
+                <div><span class="hotel-label">ACCOMMODATION</span><div class="hotel-info">Basic Hostel (Shared)</div></div>
+                <span class="map-icon"><i class="fa-solid fa-crow"></i></span>
+            </div>
+            <div class="memo-area"><i class="fa-regular fa-pen-to-square memo-icon"></i><input type="text" class="memo-input" id="m12" placeholder="備註：晚上超冷..." oninput="saveM('m12')"></div>
+        </div>
+
+        <!-- Day 13 -->
+        <div class="card">
+            <div class="day-header"><span class="day-label">DAY 13</span><span class="date-label">02/23 (一)</span></div>
+            <div class="route-info"><i class="fa-solid fa-location-dot" style="color:var(--primary-orange)"></i> 抵達聖佩德羅 (San Pedro) <span class="temp-badge">10-25°C</span></div>
+            <p class="intro-text">清晨穿越邊境進入智利。抵達聖佩德羅德阿塔卡馬 (San Pedro de Atacama)。下午參觀月亮谷 (Valle de la Luna) 欣賞沙漠日落。晚上參加星空團，在全世界最乾燥的地方觀星。</p>
+            <div class="hotel-box">
+                <div><span class="hotel-label">ACCOMMODATION</span><div class="hotel-info">San Pedro Local Hotel</div></div>
+                <a href="https://maps.google.com/?q=San+Pedro+de+Atacama" target="_blank" class="map-icon"><i class="fa-solid fa-map-location-dot"></i></a>
+            </div>
+            <div class="memo-area"><i class="fa-regular fa-pen-to-square memo-icon"></i><input type="text" class="memo-input" id="m13" placeholder="備註：要準備智利披索..." oninput="saveM('m13')"></div>
+        </div>
+
+        <!-- Day 14 -->
+        <div class="card">
+            <div class="day-header"><span class="day-label">DAY 14</span><span class="date-label">02/24 (二)</span></div>
+            <div class="route-info"><i class="fa-solid fa-location-dot" style="color:var(--primary-orange)"></i> 飛往聖地牙哥 (Santiago) <span class="temp-badge">15-28°C</span></div>
+            <p class="intro-text">前往卡拉馬機場 (CJC)，搭乘 LA147 (10:03) 飛往智利首都聖地牙哥。下午市區漫遊，感受這座現代與歷史交織的城市。推薦登上 Costanera Center 觀景台俯瞰城市。</p>
+            <div class="hotel-box">
+                <div><span class="hotel-label">ACCOMMODATION</span><div class="hotel-info">Santiago Hotel</div></div>
+                <a href="https://maps.google.com/?q=Santiago+Chile" target="_blank" class="map-icon"><i class="fa-solid fa-map-location-dot"></i></a>
+            </div>
+            <div class="memo-area"><i class="fa-regular fa-pen-to-square memo-icon"></i><input type="text" class="memo-input" id="m14" placeholder="備註..." oninput="saveM('m14')"></div>
+        </div>
+
+        <!-- Day 15 -->
+        <div class="card">
+            <div class="day-header"><span class="day-label">DAY 15</span><span class="date-label">02/25 (三)</span></div>
+            <div class="route-info"><i class="fa-solid fa-location-dot" style="color:var(--primary-orange)"></i> 聖地牙哥市區觀光 <span class="temp-badge">15-29°C</span></div>
+            <p class="intro-text">走訪武器廣場 (Plaza de Armas)、聖地牙哥大教堂與聖露西亞山 (Santa Lucia Hill)。這裡是智利的歷史心臟。晚上可到 Bellavista 區享用海鮮大餐。</p>
+            <div class="memo-area"><i class="fa-regular fa-pen-to-square memo-icon"></i><input type="text" class="memo-input" id="m15" placeholder="備註..." oninput="saveM('m15')"></div>
+        </div>
+
+        <!-- Day 16 -->
+        <div class="card">
+            <div class="day-header"><span class="day-label">DAY 16</span><span class="date-label">02/26 (四)</span></div>
+            <div class="route-info"><i class="fa-solid fa-location-dot" style="color:var(--primary-orange)"></i> 安地斯山麓與酒莊 <span class="temp-badge">14-28°C</span></div>
+            <p class="intro-text">前往安地斯山麓一日遊 (Cajón del Maipo)，欣賞壯麗的水庫與雪山景色。回程造訪知名酒莊 (如 Concha y Toro) 品嚐智利引以為傲的紅酒。</p>
+            <div class="memo-area"><i class="fa-regular fa-pen-to-square memo-icon"></i><input type="text" class="memo-input" id="m16" placeholder="備註：買紅酒..." oninput="saveM('m16')"></div>
+        </div>
+
+        <!-- Day 17 -->
+        <div class="card">
+            <div class="day-header"><span class="day-label">DAY 17</span><span class="date-label">02/27 (五)</span></div>
+            <div class="route-info"><i class="fa-solid fa-location-dot" style="color:var(--primary-orange)"></i> 聖地牙哥 ➔ 機場 <span class="temp-badge">15-28°C</span></div>
+            <p class="intro-text">旅程的最後一天。把握時間採購伴手禮。晚上前往機場，搭乘 LA602 (23:55) 飛往洛杉磯。再見了，南美洲！</p>
+            <div class="memo-area"><i class="fa-regular fa-pen-to-square memo-icon"></i><input type="text" class="memo-input" id="m17" placeholder="備註：退稅..." oninput="saveM('m17')"></div>
+        </div>
+
+        <!-- Day 18 -->
+        <div class="card">
+            <div class="day-header"><span class="day-label">DAY 18</span><span class="date-label">02/28 (六)</span></div>
+            <div class="route-info"><i class="fa-solid fa-location-dot" style="color:var(--primary-orange)"></i> 飛行與轉機</div>
+            <p class="intro-text">上午抵達洛杉磯 (LAX)，轉機等待約 4.5 小時。搭乘長榮 BR5 (10:40+1) 飛回台北。</p>
+        </div>
+
+        <!-- Day 19 -->
+        <div class="card">
+            <div class="day-header"><span class="day-label">DAY 19</span><span class="date-label">03/01 (日)</span></div>
+            <div class="route-info"><i class="fa-solid fa-location-dot" style="color:var(--primary-orange)"></i> 抵達溫暖的家</div>
+            <p class="intro-text">預計下午 17:20 抵達桃園機場 (TPE)。結束 19 天精彩的南美大冒險，好好休息，整理照片吧！</p>
         </div>
 
     </div>
 
+    <!-- 2. 交通分頁 (日期排序 + 修復Icon遮擋) -->
     <div id="transport" class="tab-content">
-        <div class="card">
-            <h3 style="margin-top:0;">📅 交通大表 (按日期排序)</h3>
-            <table>
-                <tr><td>02/11</td><td>✈️ BR12 TPE-LAX (19:40)</td></tr>
-                <tr><td>02/11</td><td>✈️ DL6071 LAX-LIM (20:35)</td></tr>
-                <tr><td>02/14</td><td>✈️ LA2069 LIM-CUZ (19:25)</td></tr>
-                <tr><td>02/16</td><td>🚆 PeruRail 至熱水鎮 (19:00)</td></tr>
-                <tr><td>02/18</td><td>🚌 夜車 庫斯科-普諾 (22:00)</td></tr>
-                <tr><td>02/20</td><td>🚌 夜車 拉巴斯-烏尤尼 (22:00)</td></tr>
-                <tr><td>02/24</td><td>✈️ LA147 CJC-SCL (10:03)</td></tr>
-                <tr><td>02/27</td><td>✈️ LA602 SCL-LAX (23:55)</td></tr>
-                <tr><td>02/28</td><td>✈️ BR5 LAX-TPE (10:40)</td></tr>
-            </table>
+        
+        <div class="timeline-date">FEBRUARY 11 (三)</div>
+        
+        <!-- 02/11 台北->洛杉磯 -->
+        <div class="ticket">
+            <div class="t-main">
+                <div class="t-route">
+                    <div class="t-city"><div class="t-code">TPE</div><div class="t-name">台北</div></div>
+                    <div class="t-mid">
+                        <div class="t-time">BR12 | 11h 40m</div>
+                        <div class="t-graphic">
+                            <div class="t-line"></div>
+                            <i class="fa-solid fa-plane t-icon"></i>
+                        </div>
+                    </div>
+                    <div class="t-city"><div class="t-code">LAX</div><div class="t-name">洛杉磯</div></div>
+                </div>
+                <div class="t-detail">
+                    <span>19:40 起飛</span>
+                    <span>T2 航廈</span>
+                </div>
+            </div>
         </div>
+
+        <!-- 02/11 洛杉磯->利馬 -->
+        <div class="ticket">
+            <div class="t-main">
+                <div class="t-route">
+                    <div class="t-city"><div class="t-code">LAX</div><div class="t-name">洛杉磯</div></div>
+                    <div class="t-mid">
+                        <div class="t-time">DL6071 | 8h 35m</div>
+                        <div class="t-graphic">
+                            <div class="t-line"></div>
+                            <i class="fa-solid fa-plane t-icon"></i>
+                        </div>
+                    </div>
+                    <div class="t-city"><div class="t-code">LIM</div><div class="t-name">利馬</div></div>
+                </div>
+                <div class="t-detail">
+                    <span>20:35 起飛</span>
+                    <span>TBIT 航廈</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="timeline-date">FEBRUARY 14 (六)</div>
+
+        <!-- 02/14 利馬->庫斯科 -->
+        <div class="ticket">
+            <div class="t-main">
+                <div class="t-route">
+                    <div class="t-city"><div class="t-code">LIM</div><div class="t-name">利馬</div></div>
+                    <div class="t-mid">
+                        <div class="t-time">LA2069 | 1h 25m</div>
+                        <div class="t-graphic">
+                            <div class="t-line"></div>
+                            <i class="fa-solid fa-plane t-icon"></i>
+                        </div>
+                    </div>
+                    <div class="t-city"><div class="t-code">CUZ</div><div class="t-name">庫斯科</div></div>
+                </div>
+                <div class="t-detail">
+                    <span>19:25 起飛</span>
+                    <span>國內線</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="timeline-date">FEBRUARY 16 (一)</div>
+
+        <!-- 02/16 奧揚泰坦博->熱水鎮 -->
+        <div class="ticket">
+            <div class="t-main">
+                <div class="t-route">
+                    <div class="t-city"><div class="t-code">OLL</div><div class="t-name">奧揚泰坦博</div></div>
+                    <div class="t-mid">
+                        <div class="t-time">PeruRail</div>
+                        <div class="t-graphic">
+                            <div class="t-line"></div>
+                            <i class="fa-solid fa-train-subway t-icon"></i>
+                        </div>
+                    </div>
+                    <div class="t-city"><div class="t-code">MAPI</div><div class="t-name">熱水鎮</div></div>
+                </div>
+                <div class="t-detail">
+                    <span>15:30/19:00 出發</span>
+                    <span>觀光火車</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="timeline-date">FEBRUARY 18 (三)</div>
+
+        <!-- 02/18 庫斯科->普諾 (夜車) -->
+        <div class="ticket">
+            <div class="t-main">
+                <div class="t-route">
+                    <div class="t-city"><div class="t-code">CUZ</div><div class="t-name">庫斯科</div></div>
+                    <div class="t-mid">
+                        <div class="t-time">Night Bus</div>
+                        <div class="t-graphic">
+                            <div class="t-line"></div>
+                            <i class="fa-solid fa-bus t-icon"></i>
+                        </div>
+                    </div>
+                    <div class="t-city"><div class="t-code">PUNO</div><div class="t-name">普諾</div></div>
+                </div>
+                <div class="t-detail">
+                    <span>22:00 出發</span>
+                    <span>Cruz del Sur</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="timeline-date">FEBRUARY 20 (五)</div>
+
+        <!-- 02/20 拉巴斯->烏尤尼 (夜車) -->
+        <div class="ticket">
+            <div class="t-main">
+                <div class="t-route">
+                    <div class="t-city"><div class="t-code">LAP</div><div class="t-name">拉巴斯</div></div>
+                    <div class="t-mid">
+                        <div class="t-time">Night Bus</div>
+                        <div class="t-graphic">
+                            <div class="t-line"></div>
+                            <i class="fa-solid fa-bus t-icon"></i>
+                        </div>
+                    </div>
+                    <div class="t-city"><div class="t-code">UYU</div><div class="t-name">烏尤尼</div></div>
+                </div>
+                <div class="t-detail">
+                    <span>22:00 出發</span>
+                    <span>Todo Turismo</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="timeline-date">FEBRUARY 24 (二)</div>
+
+        <!-- 02/24 卡拉馬->聖地牙哥 -->
+        <div class="ticket">
+            <div class="t-main">
+                <div class="t-route">
+                    <div class="t-city"><div class="t-code">CJC</div><div class="t-name">卡拉馬</div></div>
+                    <div class="t-mid">
+                        <div class="t-time">LA147 | 2h 06m</div>
+                        <div class="t-graphic">
+                            <div class="t-line"></div>
+                            <i class="fa-solid fa-plane t-icon"></i>
+                        </div>
+                    </div>
+                    <div class="t-city"><div class="t-code">SCL</div><div class="t-name">聖地牙哥</div></div>
+                </div>
+                <div class="t-detail">
+                    <span>10:03 起飛</span>
+                    <span>智利國內線</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="timeline-date">FEBRUARY 27 (五)</div>
+
+        <!-- 02/27 聖地牙哥->洛杉磯 -->
+        <div class="ticket">
+            <div class="t-main">
+                <div class="t-route">
+                    <div class="t-city"><div class="t-code">SCL</div><div class="t-name">聖地牙哥</div></div>
+                    <div class="t-mid">
+                        <div class="t-time">LA602 | 11h 20m</div>
+                        <div class="t-graphic">
+                            <div class="t-line"></div>
+                            <i class="fa-solid fa-plane t-icon"></i>
+                        </div>
+                    </div>
+                    <div class="t-city"><div class="t-code">LAX</div><div class="t-name">洛杉磯</div></div>
+                </div>
+                <div class="t-detail">
+                    <span>23:55 起飛</span>
+                    <span>國際航廈</span>
+                </div>
+            </div>
+        </div>
+
     </div>
 
+    <!-- 3. 清單分頁 -->
     <div id="prep" class="tab-content">
-        <div class="card">
-            <div class="list-section">
-                <h3>🛂 簽證與重要文件 (9項)</h3>
-                <div class="todo-item"><input type="checkbox"> <span>玻利維亞簽證表 (已填寫)</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>2吋證件照 (4張備用)</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>護照正本 (效期6個月)</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>護照影本 (2份)</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>財力證明 (信用卡/存款)</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>黃熱病疫苗 (小黃卡)</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>住宿證明 (電子/列印)</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>離境機票證明</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>美國 ESTA (LAX轉機)</span></div>
-            </div>
-
-            <div class="list-section">
-                <h3>💵 現金與財物 (8項)</h3>
-                <div class="todo-item"><input type="checkbox"> <span>團費尾款 $900 美金 (新鈔)</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>玻國簽證費 $50 / 落地簽 $110</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>導遊司機小費 ($200-$300)</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>雙信用卡 (不同發卡組織)</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>提款卡 (開通海外領款)</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>台幣現金 (機場往返)</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>隱形防盜錢包</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>海外刷卡回饋已確認</span></div>
-            </div>
-
-            <div class="list-section">
-                <h3>💊 醫藥與高反 (10項)</h3>
-                <div class="todo-item"><input type="checkbox"> <span>高山症藥 (丹木斯)</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>腸胃藥 (正露丸/表飛鳴)</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>止瀉藥 (克痢)</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>止痛藥 (普拿疼)</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>綜合感冒藥</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>維他命 B群/C</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>休足時間 (彩虹山必備)</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>創口貼/優碘棉片</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>個人常備藥</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>防蚊液 (低地雨林區用)</span></div>
-            </div>
-
-            <div class="list-section">
-                <h3>🧣 衣物與裝備 (14項)</h3>
-                <div class="todo-item"><input type="checkbox"> <span>發熱衣/褲 (Ultra Warm)</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>羽絨外套 (可收納輕便型)</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>Gore-Tex 防風防水外套</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>毛帽/圍巾/手套</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>登山鞋/防滑球鞋</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>專業偏光墨鏡 (防鹽反光)</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>防曬乳 (SPF50+)</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>護唇膏 & 強力保濕乳液</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>行動電源 (高容量)</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>萬國轉接頭 (C型/雙圓頭)</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>暖暖包 (貼式/手握式)</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>拍照趣味道具 (鹽沼用)</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>充氣 U型枕 (長途飛機/巴士)</span></div>
-                <div class="todo-item"><input type="checkbox"> <span>速乾毛巾</span></div>
-            </div>
+        
+        <div class="list-group">
+            <div class="list-title"><i class="fa-regular fa-id-card"></i> 證件與重要文件</div>
+            <div class="todo-item"><input type="checkbox" class="todo-checkbox"> <div><span class="todo-text">護照正本 (效期 6 個月以上)</span></div></div>
+            <div class="todo-item"><input type="checkbox" class="todo-checkbox"> <div><span class="todo-text">玻利維亞簽證文件 (申請表/財力/行程)</span></div></div>
+            <div class="todo-item"><input type="checkbox" class="todo-checkbox"> <div><span class="todo-text">黃熱病疫苗小黃卡</span><span class="todo-sub">玻國入境抽查必備</span></div></div>
+            <div class="todo-item"><input type="checkbox" class="todo-checkbox"> <div><span class="todo-text">美國 ESTA 轉機許可</span></div></div>
+            <div class="todo-item"><input type="checkbox" class="todo-checkbox"> <div><span class="todo-text">護照影本 (2份) & 大頭照 (4張)</span></div></div>
+            <div class="todo-item"><input type="checkbox" class="todo-checkbox"> <div><span class="todo-text">保險證明 (英文版)</span></div></div>
         </div>
+
+        <div class="list-group">
+            <div class="list-title"><i class="fa-solid fa-wallet"></i> 金錢與財務</div>
+            <div class="todo-item"><input type="checkbox" class="todo-checkbox"> <div><span class="todo-text">團費尾款美金 $900</span><span class="todo-sub">需為無污損新鈔</span></div></div>
+            <div class="todo-item"><input type="checkbox" class="todo-checkbox"> <div><span class="todo-text">簽證費 $50 / 落地簽 $110</span></div></div>
+            <div class="todo-item"><input type="checkbox" class="todo-checkbox"> <div><span class="todo-text">導遊司機小費 ($200-$300)</span></div></div>
+            <div class="todo-item"><input type="checkbox" class="todo-checkbox"> <div><span class="todo-text">備用信用卡 (不同發卡組織)</span></div></div>
+            <div class="todo-item"><input type="checkbox" class="todo-checkbox"> <div><span class="todo-text">提款卡 (開通跨國提領)</span></div></div>
+        </div>
+
+        <div class="list-group">
+            <div class="list-title"><i class="fa-solid fa-pills"></i> 藥品與保健</div>
+            <div class="todo-item"><input type="checkbox" class="todo-checkbox"> <div><span class="todo-text">高山症藥 (丹木斯 Acetazolamide)</span><span class="todo-sub">提前服用</span></div></div>
+            <div class="todo-item"><input type="checkbox" class="todo-checkbox"> <div><span class="todo-text">腸胃藥 / 止瀉藥 / 益生菌</span></div></div>
+            <div class="todo-item"><input type="checkbox" class="todo-checkbox"> <div><span class="todo-text">感冒藥 / 止痛藥 (普拿疼)</span></div></div>
+            <div class="todo-item"><input type="checkbox" class="todo-checkbox"> <div><span class="todo-text">暈車藥 (長途巴士用)</span></div></div>
+        </div>
+
+        <div class="list-group">
+            <div class="list-title"><i class="fa-solid fa-suitcase"></i> 裝備與衣物</div>
+            <div class="todo-item"><input type="checkbox" class="todo-checkbox"> <div><span class="todo-text">洋蔥式穿搭 (發熱衣/羽絨/防風層)</span></div></div>
+            <div class="todo-item"><input type="checkbox" class="todo-checkbox"> <div><span class="todo-text">防曬乳 (SPF50+) & 護唇膏</span></div></div>
+            <div class="todo-item"><input type="checkbox" class="todo-checkbox"> <div><span class="todo-text">專業太陽眼鏡 (防鹽沼反光)</span></div></div>
+            <div class="todo-item"><input type="checkbox" class="todo-checkbox"> <div><span class="todo-text">遮陽帽 & 毛帽 & 圍巾</span></div></div>
+            <div class="todo-item"><input type="checkbox" class="todo-checkbox"> <div><span class="todo-text">好走的鞋 (登山鞋/運動鞋)</span></div></div>
+            <div class="todo-item"><input type="checkbox" class="todo-checkbox"> <div><span class="todo-text">行動電源 & 萬國轉接頭</span></div></div>
+            <div class="todo-item"><input type="checkbox" class="todo-checkbox"> <div><span class="todo-text">網卡 / eSIM</span></div></div>
+        </div>
+
     </div>
 
+    <!-- 底部導航 -->
     <nav class="nav-bar">
-        <button class="nav-btn active" onclick="showPage('itinerary', this)"><span>📅</span>行程</button>
-        <button class="nav-btn" onclick="showPage('transport', this)"><span>✈️</span>交通</button>
-        <button class="nav-btn" onclick="showPage('prep', this)"><span>✅</span>清單</button>
+        <button class="nav-btn active" onclick="showPage('itinerary', this)">
+            <i class="fa-regular fa-calendar-days"></i>
+            行程
+        </button>
+        <button class="nav-btn" onclick="showPage('transport', this)">
+            <i class="fa-solid fa-plane-departure"></i>
+            交通
+        </button>
+        <button class="nav-btn" onclick="showPage('prep', this)">
+            <i class="fa-solid fa-list-check"></i>
+            清單
+        </button>
     </nav>
 </div>
 
 <script>
+    // 1. 倒數計時器
+    function updateCountdown() {
+        const target = new Date('February 11, 2026 19:40:00').getTime();
+        const now = new Date().getTime();
+        const diff = target - now;
+        
+        if (diff < 0) {
+            document.getElementById('countdown').innerHTML = "旅程進行中！🚀";
+            return;
+        }
+
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        
+        document.getElementById('countdown').innerHTML = `距離出發：${d} 天 ${h} 小時 ${m} 分`;
+    }
+    setInterval(updateCountdown, 60000); updateCountdown();
+
+    // 2. 備註功能 (LocalStorage)
+    function saveM(id) {
+        localStorage.setItem('sa_memo_2026_' + id, document.getElementById(id).value);
+    }
+
+    function loadM() {
+        const inputs = document.querySelectorAll('.memo-input');
+        inputs.forEach(input => {
+            const val = localStorage.getItem('sa_memo_2026_' + input.id);
+            if (val) input.value = val;
+        });
+    }
+
+    // 3. 清單記憶功能
+    function saveCheck() {
+        const checks = document.querySelectorAll('.todo-checkbox');
+        const state = [];
+        checks.forEach(c => state.push(c.checked));
+        localStorage.setItem('sa_check_2026', JSON.stringify(state));
+    }
+
+    function loadCheck() {
+        const saved = JSON.parse(localStorage.getItem('sa_check_2026'));
+        if (saved) {
+            const checks = document.querySelectorAll('.todo-checkbox');
+            checks.forEach((c, i) => {
+                if (saved[i]) c.checked = true;
+            });
+        }
+        // 綁定事件
+        document.querySelectorAll('.todo-checkbox').forEach(c => {
+            c.addEventListener('change', saveCheck);
+        });
+    }
+
+    // 4. 分頁切換
     function showPage(pageId, element) {
         document.querySelectorAll('.tab-content').forEach(p => p.classList.remove('active'));
         document.getElementById(pageId).classList.add('active');
@@ -247,7 +727,11 @@
         element.classList.add('active');
         window.scrollTo(0, 0);
     }
-</script>
 
+    window.onload = function() {
+        loadM();
+        loadCheck();
+    };
+</script>
 </body>
 </html>
